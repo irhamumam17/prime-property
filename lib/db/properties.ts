@@ -112,6 +112,23 @@ export async function getProperties(
   };
 }
 
+export async function getPropertyById(id: string): Promise<Property | null> {
+  const client = createServiceClient();
+  const { data, error } = await client
+    .from("properties")
+    .select("*")
+    .eq("id", id)
+    .is("deleted_at", null)
+    .single();
+
+  if (error) {
+    console.error("Failed to fetch property:", error);
+    return null;
+  }
+
+  return data ? mapDbPropertyToProperty(data) : null;
+}
+
 function mapDbPropertyToProperty(dbProperty: any): Property {
   return {
     id: dbProperty.id,
