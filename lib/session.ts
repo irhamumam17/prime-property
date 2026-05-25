@@ -12,7 +12,7 @@ function getKey(): Uint8Array {
 }
 
 export async function encrypt(payload: SessionPayload): Promise<string> {
-  return new SignJWT(payload as Record<string, unknown>)
+  return new SignJWT({ ...payload } as Record<string, unknown>)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
