@@ -129,6 +129,110 @@ export async function getPropertyById(id: string): Promise<Property | null> {
   return data ? mapDbPropertyToProperty(data) : null;
 }
 
+export async function createProperty(
+  data: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+  createdBy: string
+): Promise<Property> {
+  const client = createServiceClient();
+  const dbData = mapPropertyToDbProperty(data, createdBy);
+
+  const { data: created, error } = await client
+    .from("properties")
+    .insert([dbData])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Failed to create property:", error);
+    throw new Error(`Failed to create property: ${error.message}`);
+  }
+
+  return mapDbPropertyToProperty(created);
+}
+
+export async function updateProperty(
+  id: string,
+  data: Partial<Omit<Property, "id" | "createdAt" | "updatedAt" | "createdBy" | "deletedAt">>
+): Promise<Property> {
+  const client = createServiceClient();
+  const dbData = mapPropertyToDbPropertyPartial(data);
+
+  const { data: updated, error } = await client
+    .from("properties")
+    .update({ ...dbData, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Failed to update property:", error);
+    throw new Error(`Failed to update property: ${error.message}`);
+  }
+
+  return mapDbPropertyToProperty(updated);
+}
+
+export async function softDeleteProperty(id: string): Promise<void> {
+  const client = createServiceClient();
+  const { error } = await client
+    .from("properties")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Failed to delete property:", error);
+    throw new Error(`Failed to delete property: ${error.message}`);
+  }
+}
+
+function mapPropertyToDbProperty(
+  property: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+  createdBy: string
+): any {
+  return {
+    nama_property: property.name,
+    group_name: property.group,
+    lebar: property.width,
+    panjang: property.length,
+    hadap: property.facing,
+    tipe: property.type,
+    tingkat: property.floors,
+    price: property.price,
+    carport: property.carport,
+    status: property.status,
+    siap: property.readiness,
+    maps_link: property.mapsUrl,
+    kawasan: property.area,
+    unit: property.unit,
+    created_by: createdBy,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function mapPropertyToDbPropertyPartial(
+  property: Partial<Omit<Property, "id" | "createdAt" | "updatedAt" | "createdBy" | "deletedAt">>
+): Record<string, any> {
+  const result: Record<string, any> = {};
+
+  if (property.name !== undefined) result.nama_property = property.name;
+  if (property.group !== undefined) result.group_name = property.group;
+  if (property.width !== undefined) result.lebar = property.width;
+  if (property.length !== undefined) result.panjang = property.length;
+  if (property.facing !== undefined) result.hadap = property.facing;
+  if (property.type !== undefined) result.tipe = property.type;
+  if (property.floors !== undefined) result.tingkat = property.floors;
+  if (property.price !== undefined) result.price = property.price;
+  if (property.carport !== undefined) result.carport = property.carport;
+  if (property.status !== undefined) result.status = property.status;
+  if (property.readiness !== undefined) result.siap = property.readiness;
+  if (property.mapsUrl !== undefined) result.maps_link = property.mapsUrl;
+  if (property.area !== undefined) result.kawasan = property.area;
+  if (property.unit !== undefined) result.unit = property.unit;
+
+  return result;
+}
+
 function mapDbPropertyToProperty(dbProperty: any): Property {
   return {
     id: dbProperty.id,

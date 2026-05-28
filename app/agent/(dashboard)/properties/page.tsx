@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { verifySession } from "@/lib/dal";
+import { verifySession, verifySuperadmin } from "@/lib/dal";
 import { getProperties } from "@/lib/db/properties";
 import { formatPrice } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/dashboard/pagination";
 import { FilterPanel } from "@/components/dashboard/filter-panel";
 import type { PropertyFilters } from "@/lib/types";
@@ -127,6 +128,15 @@ async function PropertyTable({ filters }: { filters: PropertyFilters }) {
 
 export default async function PropertiesPage({ searchParams }: PageProps) {
   await verifySession();
+
+  let isSuperadmin = false;
+  try {
+    await verifySuperadmin();
+    isSuperadmin = true;
+  } catch {
+    isSuperadmin = false;
+  }
+
   const params = await searchParams;
 
   const filters: PropertyFilters = {
@@ -151,7 +161,14 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-primary mb-6">Daftar Properti</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-primary">Daftar Properti</h1>
+        {isSuperadmin && (
+          <Link href="/agent/properties/new">
+            <Button variant="gold-filled">+ Tambah Properti</Button>
+          </Link>
+        )}
+      </div>
 
       <FilterPanel areas={uniqueAreas} />
 
