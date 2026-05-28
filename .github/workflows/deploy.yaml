@@ -58,8 +58,7 @@ jobs:
       - name: Deploy to k3s
         run: |
           kubectl set image deployment/prime-property \
-            prime-property=${{ secrets.DOCKERHUB_USERNAME }}/prime-property:${{ github.sha }} \
-            --record
+            prime-property=${{ secrets.DOCKERHUB_USERNAME }}/prime-property:${{ github.sha }}
 
       - name: Wait for rollout
         run: |
