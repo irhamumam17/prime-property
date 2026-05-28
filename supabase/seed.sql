@@ -3,11 +3,11 @@
 
 -- Insert superadmin user (password: SuperAdmin123!)
 INSERT INTO users (email, password_hash, name, role, is_active) VALUES
-  ('superadmin@primeproperty.id', '$2b$10$YR3p1X9vf8K3.K9lM8qDOOx7y2N1k9v5s8q7r6p5o4n3m2l1k0j9', 'Super Admin', 'superadmin', true);
+  ('superadmin@primeproperty.id', '$2b$10$HOdIWjMRyNJjZXAlPkudju6YTq602w1qKUkGAIXI8Hqmepla3topy', 'Super Admin', 'superadmin', true);
 
 -- Insert admin user (password: Admin123!)
 INSERT INTO users (email, password_hash, name, role, is_active) VALUES
-  ('admin@primeproperty.id', '$2b$10$c3nJ6q5L9K8m2P0O7i5T4q3R2p1O0n9m8L7k6J5i4H3g2F1e0D9c', 'Admin User', 'admin', true);
+  ('admin@primeproperty.id', '$2b$10$ruYvn9bfA0pUX3OoUfdpvO2DvKOT9oI7qdSPrgr/9Tu.Jw8pS.JMq', 'Admin User', 'admin', true);
 
 -- Get superadmin ID for created_by foreign key
 WITH admin_id AS (
