@@ -57,6 +57,7 @@ jobs:
 
       - name: Deploy to k3s
         run: |
+          kubectl apply -f k8s/
           kubectl set image deployment/prime-property \
             prime-property=${{ secrets.DOCKERHUB_USERNAME }}/prime-property:${{ github.sha }}
 
