@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import type {
   Property,
   PropertyFilters,
@@ -216,6 +217,12 @@ export async function softDeleteProperty(id: string): Promise<void> {
     throw new Error(`Failed to delete property: ${error.message}`);
   }
 }
+
+export const getFeaturedProperties = unstable_cache(
+  () => getProperties({ status: "in_stock", perPage: 6, page: 1 }),
+  ["featured-properties"],
+  { revalidate: 3600 }
+);
 
 function mapPropertyToDbProperty(
   property: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt" | "createdBy">,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
-import { getProperties } from "@/lib/db/properties";
+import { getFeaturedProperties } from "@/lib/db/properties";
 import { StatusBadge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
@@ -117,11 +117,7 @@ const WhatsAppIcon = () => (
 );
 
 export default async function LandingPage() {
-  const properties = await getProperties({
-    status: "in_stock",
-    perPage: 6,
-    page: 1,
-  });
+  const properties = await getFeaturedProperties();
 
   return (
     <div className="w-full">
