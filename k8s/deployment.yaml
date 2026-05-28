@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prime-property
+  labels:
+    app: prime-property
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prime-property
+  template:
+    metadata:
+      labels:
+        app: prime-property
+    spec:
+      containers:
+      - name: prime-property
+        image: prime-property:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: SUPABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: prime-property-secrets
+              key: supabase-url
+        - name: SUPABASE_SERVICE_ROLE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: prime-property-secrets
+              key: supabase-service-role-key
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: prime-property-secrets
+              key: session-secret
+        - name: ADMIN_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: prime-property-secrets
+              key: admin-email
+        - name: RESEND_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: prime-property-secrets
+              key: resend-api-key
+        - name: NEXT_PUBLIC_APP_URL
+          valueFrom:
+            configMapKeyRef:
+              name: prime-property-config
+              key: next-public-app-url
+        - name: NODE_ENV
+          value: "production"
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
