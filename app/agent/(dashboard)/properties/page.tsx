@@ -99,7 +99,7 @@ async function PropertyTable({ filters }: { filters: PropertyFilters }) {
                         ? "siap-huni"
                         : prop.readiness === "siap_kosong"
                           ? "siap-kosong"
-                          : "siap-huni-renovasi"
+                          : "siap-renovasi"
                     }
                     label={prop.readiness.replace(/_/g, " ")}
                   />

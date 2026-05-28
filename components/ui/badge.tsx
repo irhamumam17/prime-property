@@ -1,7 +1,7 @@
 import React from "react";
 import type { PropertyStatus, PropertyReadiness } from "@/lib/types";
 
-type BadgeVariant = "in-stock" | "sold-out" | "siap-huni" | "siap-kosong" | "siap-huni-renovasi";
+type BadgeVariant = "in-stock" | "sold-out" | "siap-huni" | "siap-kosong" | "siap-renovasi";
 
 interface BadgeProps {
   variant: BadgeVariant;
@@ -13,7 +13,7 @@ const variantClasses: Record<BadgeVariant, string> = {
   "sold-out": "bg-accent-red bg-opacity-10 text-accent-red",
   "siap-huni": "bg-gold bg-opacity-20 text-gold",
   "siap-kosong": "bg-purple-100 text-purple-800",
-  "siap-huni-renovasi": "bg-blue-100 text-blue-800",
+  "siap-renovasi": "bg-blue-100 text-blue-800",
 };
 
 export function Badge({ variant, label }: BadgeProps) {
@@ -39,7 +39,7 @@ export function StatusBadge({ status, readiness }: StatusBadgeProps) {
   const readinessMap: Record<PropertyReadiness, BadgeVariant> = {
     siap_huni: "siap-huni",
     siap_kosong: "siap-kosong",
-    siap_huni_renovasi: "siap-huni-renovasi",
+    siap_huni_renovasi: "siap-renovasi",
   };
 
   const readinessLabel: Record<PropertyReadiness, string> = {
