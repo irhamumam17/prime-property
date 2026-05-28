@@ -3,6 +3,17 @@ import { hash, compare } from "bcryptjs";
 import type { User } from "@/lib/types";
 import { createServiceClient } from "@/lib/supabase";
 
+export async function getAllUsers(): Promise<User[]> {
+  const client = createServiceClient();
+  const { data, error } = await client
+    .from("users")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+  return data.map(mapDbUserToUser);
+}
+
 export async function getUserByEmail(email: string): Promise<User | null> {
   const client = createServiceClient();
   const { data, error } = await client
