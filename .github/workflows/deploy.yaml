@@ -63,4 +63,4 @@ jobs:
 
       - name: Wait for rollout
         run: |
-          kubectl rollout status deployment/prime-property --timeout=120s
+          kubectl rollout status deployment/prime-property --timeout=300s

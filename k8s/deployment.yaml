@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: prime-property
-        image: prime-property:latest
+        image: irhamu17/prime-property:latest
         ports:
         - containerPort: 3000
         env:
@@ -56,15 +56,15 @@ spec:
           httpGet:
             path: /api/health
             port: 3000
-          initialDelaySeconds: 15
+          initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
-          failureThreshold: 3
+          failureThreshold: 6
         livenessProbe:
           httpGet:
             path: /api/health
             port: 3000
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 30
           timeoutSeconds: 5
           failureThreshold: 3
