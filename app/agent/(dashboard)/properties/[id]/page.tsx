@@ -1,21 +1,29 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { verifySession } from "@/lib/dal";
+import { verifySuperadmin } from "@/lib/dal";
 import { getPropertyById } from "@/lib/db/properties";
 import { formatPrice } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
+import { DeletePropertyButton } from "./delete-button";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
 export default async function PropertyDetailPage({ params }: PageProps) {
-  const session = await verifySession();
   const { id } = await params;
   const property = await getPropertyById(id);
 
   if (!property) {
     notFound();
+  }
+
+  let isSuperadmin = false;
+  try {
+    const session = await verifySuperadmin();
+    isSuperadmin = true;
+  } catch {
+    isSuperadmin = false;
   }
 
   return (
@@ -145,7 +153,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         </div>
 
         {/* Superadmin Actions */}
-        {session.role === "superadmin" && (
+        {isSuperadmin && (
           <div className="flex gap-4 pt-8 border-t border-gray-300">
             <Link
               href={`/agent/properties/${id}/edit`}
@@ -153,27 +161,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             >
               Edit
             </Link>
-            <form
-              action="/api/properties/delete"
-              method="POST"
-              onSubmit={(e) => {
-                if (
-                  !confirm(
-                    `Apakah Anda yakin ingin menghapus "${property.name}"? Aksi ini tidak dapat dibatalkan.`
-                  )
-                ) {
-                  e.preventDefault();
-                }
-              }}
-            >
-              <input type="hidden" name="id" value={property.id} />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-accent-red text-white rounded-lg hover:bg-red-700 transition font-semibold"
-              >
-                Hapus
-              </button>
-            </form>
+            <DeletePropertyButton propertyId={id} propertyName={property.name} />
           </div>
         )}
       </div>
