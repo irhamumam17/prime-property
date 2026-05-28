@@ -2,6 +2,30 @@ import "server-only";
 import type { Property, PropertyFilters, PaginatedProperties } from "@/lib/types";
 import { createServiceClient } from "@/lib/supabase";
 
+interface DbProperty {
+  id: string;
+  nama_property: string;
+  group_name: string;
+  lebar: number;
+  panjang: number;
+  hadap: string[];
+  tipe: string;
+  tingkat: number;
+  price: number;
+  carport: boolean;
+  status: string;
+  siap: string;
+  maps_link: string | null;
+  kawasan: string[];
+  unit: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+type DbPropertyUpdate = Record<string, string | number | boolean | string[] | null>;
+
 export async function getProperties(
   filters: PropertyFilters = {}
 ): Promise<PaginatedProperties> {
@@ -188,7 +212,7 @@ export async function softDeleteProperty(id: string): Promise<void> {
 function mapPropertyToDbProperty(
   property: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt">,
   createdBy: string
-): any {
+): DbProperty {
   return {
     nama_property: property.name,
     group_name: property.group,
@@ -212,8 +236,8 @@ function mapPropertyToDbProperty(
 
 function mapPropertyToDbPropertyPartial(
   property: Partial<Omit<Property, "id" | "createdAt" | "updatedAt" | "createdBy" | "deletedAt">>
-): Record<string, any> {
-  const result: Record<string, any> = {};
+): DbPropertyUpdate {
+  const result: DbPropertyUpdate = {};
 
   if (property.name !== undefined) result.nama_property = property.name;
   if (property.group !== undefined) result.group_name = property.group;
@@ -233,7 +257,7 @@ function mapPropertyToDbPropertyPartial(
   return result;
 }
 
-function mapDbPropertyToProperty(dbProperty: any): Property {
+function mapDbPropertyToProperty(dbProperty: DbProperty): Property {
   return {
     id: dbProperty.id,
     name: dbProperty.nama_property,

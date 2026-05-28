@@ -105,7 +105,16 @@ export async function getUserCredentialsByEmail(
   return { id: data.id, passwordHash: data.password_hash };
 }
 
-function mapDbUserToUser(dbUser: any): User {
+interface DbUser {
+  id: string;
+  email: string;
+  name: string;
+  role: "admin" | "superadmin";
+  is_active: boolean;
+  created_at: string;
+}
+
+function mapDbUserToUser(dbUser: DbUser): User {
   return {
     id: dbUser.id,
     email: dbUser.email,
