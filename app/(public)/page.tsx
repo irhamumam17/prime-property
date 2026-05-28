@@ -3,6 +3,8 @@ import { formatPrice } from "@/lib/format";
 import { getProperties } from "@/lib/db/properties";
 import { StatusBadge } from "@/components/ui/badge";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Prime Property — Properti Premium Pilihan",
   description:
