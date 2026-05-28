@@ -43,7 +43,7 @@ export function FilterPanel({ areas }: FilterPanelProps) {
     searchParams.get("maxPrice") || ""
   );
 
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debounceTimer = useRef<number | null>(null);
 
   const updateFilters = useCallback(() => {
     const params = new URLSearchParams(searchParams);

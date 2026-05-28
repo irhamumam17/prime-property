@@ -14,7 +14,7 @@ import type { ActionResult, Property, FacingDirection } from "@/lib/types";
 
 const propertySchema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter").max(100),
-  group: z.string().optional().or(z.literal("")),
+  group: z.string().nullable().default(null),
   width: z.number().positive("Lebar harus > 0").multipleOf(0.01),
   length: z.number().positive("Panjang harus > 0").multipleOf(0.01),
   facing: z
@@ -27,11 +27,11 @@ const propertySchema = z.object({
   status: z.enum(["in_stock", "sold_out"] as const),
   readiness: z.enum(["siap_huni", "siap_kosong", "siap_huni_renovasi"] as const),
   area: z.array(z.string()).min(1, "Pilih minimal 1 kawasan"),
-  unit: z.string().optional().or(z.literal("")),
+  unit: z.string().nullable().default(null),
   mapsUrl: z
     .string()
-    .optional()
-    .or(z.literal(""))
+    .nullable()
+    .default(null)
     .refine(
       (val) => !val || val.includes("google.com/maps"),
       "Maps link harus dari google.com/maps"
@@ -52,7 +52,7 @@ export async function createProperty(
 
     const data: PropertyFormData = {
       name: parsed.name as string,
-      group: (parsed.group as string) || undefined,
+      group: (parsed.group as string) || null,
       width: parseFloat(parsed.width as string),
       length: parseFloat(parsed.length as string),
       facing,
@@ -63,14 +63,14 @@ export async function createProperty(
       status: parsed.status as "in_stock" | "sold_out",
       readiness: parsed.readiness as "siap_huni" | "siap_kosong" | "siap_huni_renovasi",
       area,
-      unit: (parsed.unit as string) || undefined,
-      mapsUrl: (parsed.mapsUrl as string) || undefined,
+      unit: (parsed.unit as string) || null,
+      mapsUrl: (parsed.mapsUrl as string) || null,
     };
 
     const validation = propertySchema.safeParse(data);
     if (!validation.success) {
       const fieldErrors: Record<string, string[]> = {};
-      validation.error.errors.forEach((err) => {
+      validation.error.issues.forEach((err) => {
         const path = err.path.join(".");
         if (!fieldErrors[path]) fieldErrors[path] = [];
         fieldErrors[path].push(err.message);
@@ -118,7 +118,7 @@ export async function updateProperty(
 
     const data: PropertyFormData = {
       name: parsed.name as string,
-      group: (parsed.group as string) || undefined,
+      group: (parsed.group as string) || null,
       width: parseFloat(parsed.width as string),
       length: parseFloat(parsed.length as string),
       facing,
@@ -129,14 +129,14 @@ export async function updateProperty(
       status: parsed.status as "in_stock" | "sold_out",
       readiness: parsed.readiness as "siap_huni" | "siap_kosong" | "siap_huni_renovasi",
       area,
-      unit: (parsed.unit as string) || undefined,
-      mapsUrl: (parsed.mapsUrl as string) || undefined,
+      unit: (parsed.unit as string) || null,
+      mapsUrl: (parsed.mapsUrl as string) || null,
     };
 
     const validation = propertySchema.safeParse(data);
     if (!validation.success) {
       const fieldErrors: Record<string, string[]> = {};
-      validation.error.errors.forEach((err) => {
+      validation.error.issues.forEach((err) => {
         const path = err.path.join(".");
         if (!fieldErrors[path]) fieldErrors[path] = [];
         fieldErrors[path].push(err.message);

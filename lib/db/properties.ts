@@ -1,5 +1,13 @@
 import "server-only";
-import type { Property, PropertyFilters, PaginatedProperties } from "@/lib/types";
+import type {
+  Property,
+  PropertyFilters,
+  PaginatedProperties,
+  FacingDirection,
+  PropertyType,
+  PropertyStatus,
+  PropertyReadiness,
+} from "@/lib/types";
 import { createServiceClient } from "@/lib/supabase";
 
 interface DbProperty {
@@ -154,7 +162,7 @@ export async function getPropertyById(id: string): Promise<Property | null> {
 }
 
 export async function createProperty(
-  data: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+  data: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt" | "createdBy">,
   createdBy: string
 ): Promise<Property> {
   const client = createServiceClient();
@@ -210,12 +218,12 @@ export async function softDeleteProperty(id: string): Promise<void> {
 }
 
 function mapPropertyToDbProperty(
-  property: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt">,
+  property: Omit<Property, "id" | "createdAt" | "updatedAt" | "deletedAt" | "createdBy">,
   createdBy: string
-): DbProperty {
+): Omit<DbProperty, "id" | "deleted_at"> {
   return {
     nama_property: property.name,
-    group_name: property.group,
+    group_name: property.group ?? "",
     lebar: property.width,
     panjang: property.length,
     hadap: property.facing,
@@ -227,7 +235,7 @@ function mapPropertyToDbProperty(
     siap: property.readiness,
     maps_link: property.mapsUrl,
     kawasan: property.area,
-    unit: property.unit,
+    unit: property.unit ?? "",
     created_by: createdBy,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -264,16 +272,16 @@ function mapDbPropertyToProperty(dbProperty: DbProperty): Property {
     group: dbProperty.group_name,
     width: dbProperty.lebar,
     length: dbProperty.panjang,
-    facing: dbProperty.hadap,
-    type: dbProperty.tipe,
+    facing: dbProperty.hadap as FacingDirection[],
+    type: dbProperty.tipe as PropertyType,
     floors: dbProperty.tingkat,
     price: dbProperty.price,
     carport: dbProperty.carport,
-    status: dbProperty.status,
-    readiness: dbProperty.siap,
+    status: dbProperty.status as PropertyStatus,
+    readiness: dbProperty.siap as PropertyReadiness,
     mapsUrl: dbProperty.maps_link,
     area: dbProperty.kawasan,
-    unit: dbProperty.unit,
+    unit: dbProperty.unit || null,
     createdAt: dbProperty.created_at,
     updatedAt: dbProperty.updated_at,
     createdBy: dbProperty.created_by,

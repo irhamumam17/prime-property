@@ -7,7 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/dashboard/pagination";
 import { FilterPanel } from "@/components/dashboard/filter-panel";
-import type { PropertyFilters } from "@/lib/types";
+import type {
+  PropertyFilters,
+  FacingDirection,
+  PropertyType,
+  PropertyStatus,
+  PropertyReadiness,
+} from "@/lib/types";
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -147,7 +153,7 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
     maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
     type: (params.type ? String(params.type) : "all") as PropertyType | "all",
     status: (params.status ? String(params.status) : "all") as PropertyStatus | "all",
-    readiness: params.readiness ? String(params.readiness).split(",") as FacingDirection[] : undefined,
+    readiness: params.readiness ? String(params.readiness).split(",") as PropertyReadiness[] : undefined,
     carport: params.carport === "true" ? true :  "all" as boolean | "all",
     page: params.page ? Number(params.page) : 1,
     perPage: params.perPage ? Number(params.perPage) : 50,

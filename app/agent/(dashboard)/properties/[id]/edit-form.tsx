@@ -235,7 +235,7 @@ export function EditPropertyForm({
               name="unit"
               type="text"
               placeholder="Nomor unit"
-              defaultValue={property.unit}
+              defaultValue={property.unit || ""}
               required
               error={state.fieldErrors?.unit?.[0]}
               disabled={isPending}

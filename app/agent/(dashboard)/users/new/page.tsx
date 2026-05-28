@@ -8,10 +8,13 @@ import { Input } from "@/components/ui/input";
 import type { ActionResult, User } from "@/lib/types";
 
 export default function CreateAdminPage() {
-  const [state, formAction, isPending] = useActionState<
-    ActionResult<User>,
-    FormData
-  >(createAdmin, { success: false, error: "" });
+  const handleSubmit = (_prevState: ActionResult<User>, formData: FormData) =>
+    createAdmin(formData);
+
+  const [state, formAction, isPending] = useActionState(handleSubmit, {
+    success: false,
+    error: "",
+  });
 
   return (
     <div>

@@ -39,10 +39,13 @@ const READINESS_OPTIONS = [
 ];
 
 export default function CreatePropertyPage() {
-  const [state, formAction, isPending] = useActionState<
-    ActionResult<Property>,
-    FormData
-  >(createProperty, { success: false, error: "" });
+  const handleSubmit = (_prevState: ActionResult<Property>, formData: FormData) =>
+    createProperty(formData);
+
+  const [state, formAction, isPending] = useActionState(handleSubmit, {
+    success: false,
+    error: "",
+  });
 
   return (
     <div>

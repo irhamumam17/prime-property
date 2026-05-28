@@ -46,7 +46,7 @@ export async function createAdmin(
     const validation = createAdminSchema.safeParse(data);
     if (!validation.success) {
       const fieldErrors: Record<string, string[]> = {};
-      validation.error.errors.forEach((err) => {
+      validation.error.issues.forEach((err) => {
         const path = err.path.join(".");
         if (!fieldErrors[path]) fieldErrors[path] = [];
         fieldErrors[path].push(err.message);
