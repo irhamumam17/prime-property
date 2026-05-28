@@ -47,10 +47,13 @@ export function EditPropertyForm({
 }) {
   
 
-  const [state, formAction, isPending] = useActionState<
-    ActionResult<Property>,
-    FormData
-  >(updatePropertyWithId, { success: false, error: "" });
+  const handleSubmit = (_prevState: ActionResult<Property>, formData: FormData) =>
+    updateProperty(id, formData);
+
+  const [state, formAction, isPending] = useActionState(handleSubmit, {
+    success: false,
+    error: "",
+  });
 
   return (
     <div>
