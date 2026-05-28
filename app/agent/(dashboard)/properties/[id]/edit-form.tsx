@@ -45,7 +45,7 @@ export function EditPropertyForm({
   id: string;
   property: Property;
 }) {
-  const updatePropertyWithId = updateProperty.bind(null, id);
+  
 
   const [state, formAction, isPending] = useActionState<
     ActionResult<Property>,
