@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -43,7 +43,7 @@ export function FilterPanel({ areas }: FilterPanelProps) {
     searchParams.get("maxPrice") || ""
   );
 
-  const debounceTimer = useMemo(() => ({ id: 0 }), []);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updateFilters = useCallback(() => {
     const params = new URLSearchParams(searchParams);
@@ -62,10 +62,10 @@ export function FilterPanel({ areas }: FilterPanelProps) {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-    clearTimeout(debounceTimer.id);
-    debounceTimer.id = window.setTimeout(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = window.setTimeout(() => {
       setSearch(e.target.value);
-    }, 300) as unknown as number;
+    }, 300);
   };
 
   const handleMultiSelect = (key: string, values: string[]) => {
@@ -78,86 +78,46 @@ export function FilterPanel({ areas }: FilterPanelProps) {
     router.push(`?${params.toString()}`);
   };
 
-  const handleReset = () => {
-    router.push("?");
-    setSearch("");
-    setMinWidth("");
-    setMaxPrice("");
-  };
-
-  const selectedAreas = searchParams.get("area")?.split(",") || [];
-  const selectedFacing = searchParams.get("facing")?.split(",") || [];
-  const selectedReadiness = searchParams.get("readiness")?.split(",") || [];
-  const selectedType = searchParams.get("type") || "all";
-  const selectedStatus = searchParams.get("status") || "all";
-  const selectedCarport = searchParams.get("carport") || "all";
-
-  const areaOptions = areas.map((area) => ({
-    value: area,
-    label: area,
-  }));
-
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-300 mb-6">
+    <div className="bg-white rounded-lg border border-gray-300 p-6 mb-6">
       <h3 className="text-lg font-semibold text-primary mb-4">Filter Properti</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-        {/* Search */}
+      <div className="space-y-4">
         <Input
-          type="text"
-          placeholder="Cari nama/grup properti..."
+          label="Cari"
+          placeholder="Nama, group, atau kawasan..."
           value={search}
           onChange={handleSearchChange}
+          className="w-full"
         />
 
-        {/* Kawasan (Multi-select) */}
-        <div className="w-full">
-          <label className="block text-sm font-medium text-primary mb-2">
-            Kawasan
-          </label>
-          <select
-            multiple
-            value={selectedAreas}
-            onChange={(e) =>
-              handleMultiSelect(
-                "area",
-                Array.from(e.target.selectedOptions, (opt) => opt.value)
-              )
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent outline-none h-12"
-          >
-            {areaOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Input
+            label="Lebar Min (m)"
+            placeholder="Min"
+            value={minWidth}
+            onChange={(e) => setMinWidth(e.target.value)}
+          />
+          <Input
+            label="Harga Max (Rp)"
+            placeholder="Max"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+          />
 
-        {/* Min Width */}
-        <Input
-          type="number"
-          placeholder="Lebar min (m²)"
-          value={minWidth}
-          onChange={(e) => setMinWidth(e.target.value)}
-          onBlur={updateFilters}
-        />
-
-        {/* Hadap (Multi-select) */}
-        <div className="w-full">
-          <label className="block text-sm font-medium text-primary mb-2">
-            Hadap
-          </label>
           <select
+            aria-label="Filter Hadapan"
             multiple
-            value={selectedFacing}
             onChange={(e) =>
               handleMultiSelect(
                 "facing",
-                Array.from(e.target.selectedOptions, (opt) => opt.value)
+                Array.from(e.target.selectedOptions, (o) => o.value)
               )
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent outline-none h-12"
+            defaultValue={
+              searchParams.get("facing")?.split(",") || []
+            }
+            className="border border-gray-300 rounded-lg p-2 text-sm"
           >
             {FACING_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -165,36 +125,16 @@ export function FilterPanel({ areas }: FilterPanelProps) {
               </option>
             ))}
           </select>
-        </div>
 
-        {/* Max Price */}
-        <Input
-          type="number"
-          placeholder="Harga max (Rp)"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-          onBlur={updateFilters}
-        />
-
-        {/* Type (Radio) */}
-        <div className="w-full">
-          <label className="block text-sm font-medium text-primary mb-2">
-            Tipe
-          </label>
           <select
-            value={selectedType}
-            onChange={(e) => {
-              const params = new URLSearchParams(searchParams);
-              if (e.target.value !== "all") {
-                params.set("type", e.target.value);
-              } else {
-                params.delete("type");
-              }
-              router.push(`?${params.toString()}`);
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent outline-none"
+            aria-label="Filter Tipe"
+            onChange={(e) =>
+              e.target.value !== "all" && handleMultiSelect("type", [e.target.value])
+            }
+            defaultValue={searchParams.get("type") || "all"}
+            className="border border-gray-300 rounded-lg p-2 text-sm"
           >
-            <option value="all">Semua</option>
+            <option value="all">Semua Tipe</option>
             {TYPE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -203,48 +143,36 @@ export function FilterPanel({ areas }: FilterPanelProps) {
           </select>
         </div>
 
-        {/* Status (Radio) */}
-        <div className="w-full">
-          <label className="block text-sm font-medium text-primary mb-2">
-            Status
-          </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <select
-            value={selectedStatus}
-            onChange={(e) => {
-              const params = new URLSearchParams(searchParams);
-              if (e.target.value !== "all") {
-                params.set("status", e.target.value);
-              } else {
-                params.delete("status");
-              }
-              router.push(`?${params.toString()}`);
-            }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent outline-none"
+            aria-label="Filter Status"
+            onChange={(e) =>
+              e.target.value !== "all" && handleMultiSelect("status", [e.target.value])
+            }
+            defaultValue={searchParams.get("status") || "all"}
+            className="border border-gray-300 rounded-lg p-2 text-sm"
           >
-            <option value="all">Semua</option>
+            <option value="all">Semua Status</option>
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
             ))}
           </select>
-        </div>
 
-        {/* Siap (Multi-select) */}
-        <div className="w-full">
-          <label className="block text-sm font-medium text-primary mb-2">
-            Siap
-          </label>
           <select
+            aria-label="Filter Siap"
             multiple
-            value={selectedReadiness}
             onChange={(e) =>
               handleMultiSelect(
                 "readiness",
-                Array.from(e.target.selectedOptions, (opt) => opt.value)
+                Array.from(e.target.selectedOptions, (o) => o.value)
               )
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent outline-none h-12"
+            defaultValue={
+              searchParams.get("readiness")?.split(",") || []
+            }
+            className="border border-gray-300 rounded-lg p-2 text-sm"
           >
             {READINESS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -252,35 +180,38 @@ export function FilterPanel({ areas }: FilterPanelProps) {
               </option>
             ))}
           </select>
-        </div>
 
-        {/* Carport (Toggle) */}
-        <div className="w-full flex items-end">
-          <label className="flex items-center gap-2">
+          <label className="flex items-center border border-gray-300 rounded-lg p-2">
             <input
               type="checkbox"
-              checked={selectedCarport === "true"}
-              onChange={(e) => {
-                const params = new URLSearchParams(searchParams);
-                if (e.target.checked) {
-                  params.set("carport", "true");
-                } else {
-                  params.delete("carport");
-                }
-                router.push(`?${params.toString()}`);
-              }}
-              className="w-4 h-4"
+              onChange={(e) =>
+                handleMultiSelect("carport", e.target.checked ? ["true"] : [])
+              }
+              defaultChecked={searchParams.get("carport") === "true"}
+              className="w-4 h-4 accent-gold"
             />
-            <span className="text-sm font-medium text-primary">Ada Carport</span>
+            <span className="ml-2 text-sm text-primary font-medium">
+              Ada Carport
+            </span>
           </label>
         </div>
-      </div>
 
-      {/* Reset Button */}
-      <div className="flex gap-2">
-        <Button onClick={handleReset} variant="ghost">
-          Reset Filter
-        </Button>
+        <div className="flex gap-2 mt-4">
+          <Button
+            onClick={() => router.push("?")}
+            variant="ghost"
+            className="text-sm"
+          >
+            Reset Filter
+          </Button>
+          <Button
+            onClick={updateFilters}
+            variant="gold-filled"
+            className="text-sm"
+          >
+            Terapkan Filter
+          </Button>
+        </div>
       </div>
     </div>
   );

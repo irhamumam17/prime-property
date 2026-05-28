@@ -143,15 +143,15 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
     search: params.search ? String(params.search) : undefined,
     area: params.area ? String(params.area).split(",") : undefined,
     minWidth: params.minWidth ? Number(params.minWidth) : undefined,
-    facing: params.facing ? String(params.facing).split(",") as any[] : undefined,
+    facing: params.facing ? String(params.facing).split(",") as FacingDirection[] : undefined,
     maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
-    type: (params.type ? String(params.type) : "all") as any,
-    status: (params.status ? String(params.status) : "all") as any,
-    readiness: params.readiness ? String(params.readiness).split(",") as any[] : undefined,
-    carport: params.carport === "true" ? true : "all" as any,
+    type: (params.type ? String(params.type) : "all") as PropertyType | "all",
+    status: (params.status ? String(params.status) : "all") as PropertyStatus | "all",
+    readiness: params.readiness ? String(params.readiness).split(",") as FacingDirection[] : undefined,
+    carport: params.carport === "true" ? true :  "all" as boolean | "all",
     page: params.page ? Number(params.page) : 1,
     perPage: params.perPage ? Number(params.perPage) : 50,
-    sortBy: (params.sortBy || "name") as any,
+    sortBy: (params.sortBy || "name") as "name" | "price_asc" | "price_desc" | "created_at" | "status",
   };
 
   const allPropertiesForAreas = await getProperties({ perPage: 1000 });

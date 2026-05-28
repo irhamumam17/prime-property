@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { formatPrice } from "@/lib/format";
 import { getProperties } from "@/lib/db/properties";
 import { Button } from "@/components/ui/button";

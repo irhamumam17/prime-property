@@ -1,4 +1,3 @@
-"use client";
 
 import { useActionState } from "react";
 import Link from "next/link";
@@ -144,7 +143,7 @@ function EditPropertyForm({
               name="facing"
               multiple
               options={FACING_OPTIONS}
-              defaultValue={property.facing as any}
+              defaultValue={property.facing}
               required
               error={state.fieldErrors?.facing?.[0]}
               disabled={isPending}
@@ -245,7 +244,7 @@ function EditPropertyForm({
               name="area"
               multiple
               options={AREA_OPTIONS}
-              defaultValue={property.area as any}
+              defaultValue={property.area}
               required
               error={state.fieldErrors?.area?.[0]}
               disabled={isPending}
